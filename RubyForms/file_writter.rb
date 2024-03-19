@@ -1,17 +1,17 @@
-class FileWritter
-  attr_accessor :answers_dir, :filename, :mode
+class FileWriter
   def initialize(mode, *args)
-    answers_dir = answers_dir
-    filename = filename
-    mode = mode
+    @answers_dir = args.first
+    @filename = args.last
+    @mode = mode
   end
 
-  def write (message)
-    message = "Message"
-    print message
+  def write(message)
+    File.open(prepare_filename(@filename), @mode) { |file| file.puts(message) }
   end
+
+  private
 
   def prepare_filename(filename)
-    #path
+    File.expand_path(filename, @answers_dir)
   end
 end
