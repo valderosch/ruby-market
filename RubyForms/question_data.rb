@@ -1,42 +1,38 @@
-
+require 'yaml'
 
 class QuestionData
-  attr_accessor :collection
+  attr_reader :collection
 
-  def initialize(collection)
-    collection = collection
-    load_data()
+  def initialize(yaml_dir)
+    @yaml_dir = yaml_dir
+    @collection = []
+    load_data
   end
 
-  def transform_to_yaml
-    #magic
+  def to_yaml
+    collection.map(&:to_h).to_yaml
   end
 
-  def transform_to_json
-    #magic
+  def save_to_yaml(filename)
+    File.open(filename, 'w') { |file| file.write(to_yaml) }
   end
+
+  private
 
   def prepare_filename(filename)
-    # magic
-  end
-
-  def each_file(&block)
-    # Each
-  end
-
-  def in_thread(&block)
-    # thread
+    File.expand_path(filename, @yaml_dir)
   end
 
   def load_data
-    # each thread loadFrom
+    # Implement this method to load data from YAML files
+    Dir.glob(prepare_filename('*.yml')).each do |file|
+      @collection.concat(load_from(file))
+    end
   end
 
   def load_from(filename)
-    # yaml reading + Question obj collection
-  end
-
-  def save_file(data, filetype, path)
-    # saving file
+    YAML.load_file(filename).map do |data|
+      Question.new(data['question'], data['answers'])
+    end
   end
 end
