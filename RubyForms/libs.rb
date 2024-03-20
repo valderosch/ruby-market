@@ -1,8 +1,9 @@
+# libs
 require 'yaml'
 require 'json'
 require 'pathname'
 
-# Підключення класів
+# Classes
 require_relative 'quiz'
 require_relative 'config'
 require_relative 'question'
