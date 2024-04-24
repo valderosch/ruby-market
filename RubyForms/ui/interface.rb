@@ -2,8 +2,9 @@ require 'tk'
 require_relative 'uiconfig'
 
 class RFormsController
+
   def initialize
-    @root = TkRoot.new { title "RForms Controller" }
+    @root = TkRoot.new { title "#{app_name}" }
     @root.width = 1280
     @root.height = 720
     @root.resizable(false, false)

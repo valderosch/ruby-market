@@ -1,5 +1,5 @@
 class Question
-  attr_accessor :question_body, :question_correct_answer, :question_correct_answers
+  attr_accessor :question_body, :question_correct_answer, :question_answers
 
   def initialize(raw_text, raw_answers)
     @question_body = raw_text
@@ -7,18 +7,22 @@ class Question
   end
 
   def display_answers
-    question_answers.each_with_index.map { |answer, index| "#{('A'..'Z').to_a[index]}. #{answer}" }
+    answers_str = ""
+    @question_answers.each_with_index do |answer, index|
+      answers_str += "#{('A'..'Z').to_a[index]}. #{answer}\n"
+    end
+    answers_str
   end
 
   def to_s
-    question_body
+    @question_body
   end
 
   def to_h
     {
-      question_body: question_body,
-      question_correct_answer: question_correct_answer,
-      question_answers: question_answers
+      question_body: @question_body,
+      question_correct_answer: @question_correct_answer,
+      question_answers: @question_answers
     }
   end
 
@@ -31,13 +35,12 @@ class Question
   end
 
   def load_answers(raw_answers)
-    # Implement this method to load answers and shuffle them
     @question_answers = raw_answers.shuffle
-    @question_correct_answer = @question_answers.index(raw_answers.first)
+    @question_correct_answer = @question_answers.first
   end
 
   def find_answer_by_char(char)
-    question_answers[char.ord - 'A'.ord]
+    index = char.upcase.ord - 'A'.ord
+    @question_answers[index]
   end
-
 end

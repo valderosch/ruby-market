@@ -13,10 +13,12 @@ class Statistics
     @incorrect_answers += 1
   end
 
-  def print_report
-    total_questions = @correct_answers + @incorrect_answers
-    correct_percentage = (@correct_answers.to_f / total_questions * 100).round(2)
-    report = "Total questions: #{total_questions}, Correct answers: #{@correct_answers}, Incorrect answers: #{@incorrect_answers}, Correct percentage: #{correct_percentage}%"
+  def print_report(total_questions)
+    percentage = (@correct_answers.to_f / total_questions * 100).round(2)
+    report = "Total questions: #{total_questions}\n"
+    report += "Correct answers: #{@correct_answers}\n"
+    report += "Incorrect answers: #{@incorrect_answers}\n"
+    report += "Percentage: #{percentage}%\n"
     @writer.write(report)
     puts report
   end

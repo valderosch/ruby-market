@@ -1,17 +1,19 @@
+require 'fileutils'
+
 class FileWriter
   def initialize(mode, *args)
     @answers_dir = args.first
-    @filename = args.last
     @mode = mode
   end
 
-  def write(message)
-    File.open(prepare_filename(@filename), @mode) { |file| file.puts(message) }
-  end
+  def write(answers, username)
+    current_time = Time.now.strftime("%Y_%m_%d_%H-%M")
 
-  private
+    user_dir = File.join(@answers_dir, username)
+    FileUtils.mkdir_p(user_dir) unless Dir.exist?(user_dir)
 
-  def prepare_filename(filename)
-    File.expand_path(filename, @answers_dir)
+    filename = "user_#{username}_#{current_time}.txt"
+
+    File.open(File.join(user_dir, filename), @mode) { |file| file.puts(answers) }
   end
 end

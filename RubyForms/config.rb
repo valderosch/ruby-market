@@ -1,5 +1,7 @@
-Quiz.config do
-  self.yaml_dir = "yml/indata"
-  self.answers_dir = "answers"
-  self.in_ext = "yml"
+require_relative 'quiz'
+
+Quiz.config do |config|
+  config.yaml_dir = "yml/indata"
+  config.answers_dir = "answers"
+  config.in_ext = "yml"
 end
