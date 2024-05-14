@@ -1,8 +1,8 @@
 # App variables
 # <----------*----------*----------*----------*--------->
-app_name = "ReForm"
+app_name = "Pollster"
 app_version = '0.0.7'
-app_title = 'Desktop controll program for quiz app'
+app_title = 'Desktop control panel for your quiz app'
 app_win_width = 1280
 app_win_height = 720
 # Font
