@@ -1,22 +1,28 @@
 require 'tk'
-require_relative 'uiconfig'
+require 'yaml'
 
 class RFormsController
+  def config
+    @config ||= YAML.load_file('E:/B.ProjectStore/Ruby/marketing/RubyForms/ui/uiconfiguration.yml')
+  end
 
   def initialize
-    @root = TkRoot.new { title "#{app_name}" }
-    @root.width = 1280
-    @root.height = 720
+    @config = config
+    @root = TkRoot.new(title: @config['app_name'])
+    @root.width = @config['app_win_width']
+    @root.height = @config['app_win_height']
     @root.resizable(false, false)
 
     @frame = TkFrame.new(@root) { background "#121212"  }.place(relx: 0, rely: 0, relwidth: 1, relheight: 1)
 
-    buttons = ["Bot", "Stats", "Input Data", "Output Data", "Clients"]
+    buttons = %w[Bot Stats Clients]
 
     @aside = TkFrame.new(@frame){background '#212121'}.place(relx: 0, rely: 0, relwidth: 0.25, relheight: 1)
 
+    @tabs = {}
+
     buttons.each_with_index do |button_name, index|
-      TkButton.new(@aside) do
+      @tabs[button_name] = TkButton.new(@aside) do
         text button_name
         bg "#535353"
         fg "#ffffff"
@@ -24,8 +30,9 @@ class RFormsController
         padx 10
         anchor 'w'
         font TkFont.new(family: "Arial", size: 14)
-        command lambda { change_content(button_name) }
       end.place(relx: 0.025, rely: 0.02 + (index * 0.1), relwidth: 0.95, relheight: 0.1)
+
+      @tabs[button_name].bind("ButtonRelease-1") { change_content(button_name) }
     end
 
     TkButton.new(@aside) do
@@ -39,22 +46,107 @@ class RFormsController
     end.place(relx: 0, rely: 0.95, relwidth: 1, relheight: 0.05)
   end
 
+  def handle_button_click(text, logs_text)
+    case text
+    when "▶"
+      add_to_logs(logs_text, "bot start")
+    when "∥"
+      add_to_logs(logs_text, "bot pause")
+    when "↻"
+      add_to_logs(logs_text, "bot restart")
+    when "⊘"
+      add_to_logs(logs_text, "bot shut down")
+    end
+  end
+
+  def add_to_logs(logs_text, message)
+    time = Time.now.strftime("%H:%M:%S")
+    logs_text.insert('end', "#{time} | #{message}\n")
+    logs_text.see('end')
+  end
+
+  # TABS
+  def create_bot_content(frame)
+    content_frame = TkFrame.new(frame) { background '#212121' }
+    content_frame.place(relx: 0, rely: 0, relwidth: 1, relheight: 1)
+
+    TkLabel.new(content_frame) do
+      text "BOT"
+      foreground  "#fff"
+      background "#212121"
+      font TkFont.new(family: "Arial", size: 14, weight: "bold")
+      anchor 'w'
+    end.place(relx:0.02, rely:0, relwidth:0.9, relheight:0.1)
+
+    info_frame = TkFrame.new(content_frame) do
+      background "#212121"
+      borderwidth 3
+      relief 'ridge'
+      highlightbackground '#ffffff'
+    end.place(relx:0.01, rely:0.14, relwidth:0.48, relheight:0.65)
+
+    logs_frame = TkFrame.new(content_frame) do
+      background "#121212"
+      borderwidth 3
+      relief 'ridge'
+    end.place(relx:0.5, rely:0.14, relwidth:0.48, relheight:0.65)
+
+    logs_text = TkText.new(logs_frame) do
+      background "#121212"
+      foreground "#ffffff"
+      borderwidth 0
+      font TkFont.new(family: "Consolas", size: 12)
+    end.place(relx: 0, rely: 0, relwidth: 1, relheight: 1)
+
+    control_frame = TkFrame.new(content_frame) do
+      background "#000"
+    end.place(relx:0.01, rely:0.87, relwidth:0.98, relheight:0.12)
+
+    button_texts = ["▶", "∥", "↻", "⊘"]
+    button_coordinates = [[0.39, 0.4], [0.47, 0.4], [0.55, 0.4], [0.92, 0.4]]
+
+    button_texts.each_with_index do |text, index|
+      TkButton.new(control_frame) do
+        text text
+        font TkFont.new(family: "Consolas", size: 16, weight: 'bold')
+        bg "#000"
+        border 0
+        foreground "#fff"
+        command -> { handle_button_click(text, logs_text) }
+      end.place(relx: button_coordinates[index][0], rely: button_coordinates[index][1], relwidth: 0.05, relheight: 0.2)
+    end
+  end
+
+  def create_stats_content(frame)
+    content_frame = TkFrame.new(frame) { background '#212121' }.place(relx: 0, rely: 0, relwidth: 1, relheight: 1)
+    TkLabel.new(content_frame) do
+      text "Statistic"
+      foreground  "#fff"
+      background "#212121"
+      font TkFont.new(family: "Arial", size: 14, weight: "bold")
+      anchor 'w'
+    end.place(relx:0.02, rely:0, relwidth:0.9, relheight:0.1)
+  end
+
+  def create_clients_content(frame)
+    content_frame = TkFrame.new(frame) { background '#212121' }.place(relx: 0, rely: 0, relwidth: 1, relheight: 1)
+    TkLabel.new(content_frame) do
+      text "Clients"
+      foreground  "#fff"
+      background "#212121"
+      font TkFont.new(family: "Arial", size: 14, weight: "bold")
+      anchor 'w'
+    end.place(relx:0.02, rely:0, relwidth:0.9, relheight:0.1)
+
+  end
+
+  # Tabs picker
   def change_content(content)
     @content_frame.destroy if defined? @content_frame
-    @content_frame = TkFrame.new(@root) { background '#fff' }.place(relx: 0.25, rely: 0.1, relwidth: 0.7, relheight: 0.7)
+    @content_frame = TkFrame.new(@root) { background '#fff' }
+    @content_frame.place(relx: 0.26, rely: 0.02, relwidth: 0.73, relheight: 0.96)
 
-    case content
-    when "Bot"
-      TkFrame.new(@content_frame) { text "Bot control pnel" }.place(relx: 0.1, rely: 0.1, relwidth: 0.8, relheight: 0.1)
-    when "Stats"
-      TkFrame.new(@content_frame) { text "Program real time stats" }.place(relx: 0.1, rely: 0.1, relwidth: 0.8, relheight: 0.1)
-    when "Input Data"
-      TkFrame.new(@content_frame) { text "Input data frame" }.place(relx: 0.1, rely: 0.1, relwidth: 0.8, relheight: 0.1)
-    when "Output Data"
-      TkFrame.new(@content_frame) { text "Output DB" }.place(relx: 0.1, rely: 0.1, relwidth: 0.8, relheight: 0.1)
-    when "Clients"
-      TkFrame.new(@content_frame) { text "Clients" }.place(relx: 0.1, rely: 0.1, relwidth: 0.8, relheight: 0.1)
-    end
+    send("create_#{content.downcase}_content", @content_frame) if respond_to?("create_#{content.downcase}_content")
   end
 
   def run
