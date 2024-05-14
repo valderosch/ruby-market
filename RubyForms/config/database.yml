@@ -1,0 +1,6 @@
+adapter: mysql
+database: pollster_bot_db
+encoding: unicode
+pool: 5
+timeout: 5000
+username : root
