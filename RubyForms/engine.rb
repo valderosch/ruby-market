@@ -1,43 +1,57 @@
-class Engine
-  def initialize(total_questions, yaml_dir, in_ext)
-    @question_collection = load_questions(total_questions, yaml_dir, in_ext)
-    @input_reader = InputReader.new
-    @user_name = @input_reader.read(welcome_message: "Enter your name:")
-    @current_time = Time.now.strftime("%Y_%m_%d_%H-%M")
-    @writer = FileWriter.new("w", Quiz.answers_dir, "user_#{@user_name}_#{@current_time}.txt")
-    @statistics = Statistics.new(@writer)
-  end
+require_relative 'question'
+require_relative 'question_data'
+require_relative 'file_writter'
+require_relative 'input_reader'
+require_relative 'stats'
+require_relative 'quiz'
+require 'yaml'
+require 'json'
+require 'pathname'
 
-  def run
-    @question_collection.each do |question|
-      puts question.to_s
-      puts question.display_answers
-      user_answer = get_answer_by_char(question)
-      check(user_answer, question.question_correct_answer)
+module QuizName
+  class Engine
+    def initialize(username)
+    @question_collection = []
+    yaml_path = Pathname.new(QuizName::Quiz.instance.yaml_dir)
+    Dir[yaml_path.join("*." + QuizName::Quiz.instance.in_ext)].each do |file|
+      data = QuizName::QuestionData.from_file(file)
+      data.questions.each { |q| @question_collection << QuizName::Question.new(q) }
     end
-    @statistics.print_report
+    @user_name = username
+    @current_time = Time.now.strftime("%d-%m-%Y %H:%M:%S")
+    @writer = QuizName::FileWriter.new('a', QuizName::Quiz.instance.answers_dir, "#{@user_name}_#{@current_time}.txt")
+    @statistics = QuizName::Statistics.new(@writer)
   end
 
-  private
-
-  def check(user_answer, correct_answer)
-    if user_answer.downcase == correct_answer.downcase
-      @statistics.correct_answer
-      puts "Your answer is correct!"
-    else
-      @statistics.incorrect_answer
-      puts "Your answer is incorrect! The correct answer is: #{correct_answer}"
+    def run
+      puts "Welcome, #{@user_name}!"
+      @question_collection.each_with_index do |question, index|
+        puts "\nQuestion #{index + 1}: #{question.text}"
+        question.options.each_with_index do |option, option_index|
+          puts "#{('A'..'Z').to_a[option_index]}) #{option}"
+        end
+        user_answer = get_answer_by_char(question)
+        check(user_answer, question.answer)
+        puts "\nYour answer: #{user_answer}"
+        puts "Correct answer: #{question.answer}"
+      end
+      puts "\nQuiz finished!"
+      @statistics.print_report
     end
-  end
 
-  def get_answer_by_char(question)
-    loop do
-      char = @input_reader.read(welcome_message: "Enter your answer (A, B, C, etc.):")
-      return question.find_answer_by_char(char) unless char.empty?
+    def check(user_answer, correct_answer)
+      if user_answer == correct_answer
+        @statistics.correct_answer
+      else
+        @statistics.incorrect_answer
+      end
     end
-  end
 
-  def load_questions(total_questions, yaml_dir, in_ext)
-    QuestionData.new(total_questions, yaml_dir, in_ext).load_data
+    def get_answer_by_char(question)
+      loop do
+        user_answer = @input_reader.read('Enter your answer: ').upcase.strip
+        return user_answer unless user_answer.empty?
+      end
+    end
   end
 end

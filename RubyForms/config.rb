@@ -1,7 +1,15 @@
-require_relative 'quiz'
+module QuizName
+  module Config
+    extend self
 
-Quiz.config do |config|
-  config.yaml_dir = "yml/indata"
-  config.answers_dir = "answers"
-  config.in_ext = "yml"
+    attr_accessor :yaml_dir, :answers_dir, :in_ext
+
+    def config
+      yield self
+    end
+
+    self.yaml_dir = "config/yml/outdata"
+    self.answers_dir = "config/answers"
+    self.in_ext = "config/yml/indata"
+  end
 end

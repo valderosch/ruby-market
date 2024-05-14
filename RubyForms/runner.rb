@@ -1,10 +1,38 @@
-require_relative 'config'
+require_relative 'quiz'
+require_relative 'input_reader'
+require_relative 'file_writter'
+require_relative 'stats'
 require_relative 'engine'
 
-total_questions = 10
-yaml_dir = "yml/indata"
-in_ext = "yml/indata"
+module QuizName
+  class Runner
+    def initialize
+      @quiz = Quiz.instance
+      @file_writer = FileWriter.new('w')
+      @statistics = Statistics.new(@file_writer)
+    end
 
+    def run
+      puts "App run"
+      @quiz.config
 
-engine = Engine.new(total_questions, yaml_dir, in_ext)
-engine.run
+      username = InputReader.read(welcome_message: 'Enter your username:', validator: ->(input) { !input.empty? }, error_message: 'Username cannot be empty')
+      start_time = Time.now
+      puts "USERNAME: #{username}"
+      puts "TIME: #{start_time}"
+
+      engine = Engine.new(username)
+      puts "Engine created"
+      engine.run
+      puts "Engine started"
+
+      result = engine.result
+      end_time = Time.now
+      @statistics.add_result(username, start_time, end_time, result)
+
+      @file_writer.write_result(username, result)
+
+      @file_writer.display_result(username, result)
+    end
+  end
+end
