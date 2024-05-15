@@ -1,13 +1,19 @@
-class InputReader
-  def read(welcome_message: nil, validator: nil, error_message: nil, process: nil)
-    puts welcome_message ? welcome_message : 'Put your answer.'
+module QuizName
+  class InputReader
+    def self.read(welcome_message: nil, validator: nil, error_message: nil, process: nil)
+      loop do
+        puts welcome_message if welcome_message
+        input = gets.chomp
+        input = process.call(input) if process
+        next if input.empty?
 
-    loop do
-      input = gets.chomp
-      input = process.call(input) if process
-      return input if validator.nil? || validator.call(input)
+        if validator && !validator.call(input)
+          puts error_message if error_message
+          next
+        end
 
-      puts error_message if error_message
+        return input
+      end
     end
   end
 end

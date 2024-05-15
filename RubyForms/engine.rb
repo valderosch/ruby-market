@@ -11,17 +11,17 @@ require 'pathname'
 module QuizName
   class Engine
     def initialize(username)
-    @question_collection = []
-    yaml_path = Pathname.new(QuizName::Quiz.instance.yaml_dir)
-    Dir[yaml_path.join("*." + QuizName::Quiz.instance.in_ext)].each do |file|
-      data = QuizName::QuestionData.from_file(file)
-      data.questions.each { |q| @question_collection << QuizName::Question.new(q) }
+      @question_collection = []
+      yaml_path = Pathname.new(QuizName::Quiz.instance.yaml_dir)
+      Dir[yaml_path.join("*." + QuizName::Quiz.instance.in_ext)].each do |file|
+        data = QuizName::QuestionData.from_file(file)
+        data.questions.each { |q| @question_collection << QuizName::Question.new(q) }
+      end
+        @user_name = username
+        @current_time = Time.now.strftime("%d-%m-%Y %H:%M:%S")
+        @writer = QuizName::FileWriter.new('a', QuizName::Quiz.instance.answers_dir, "#{@user_name}_#{@current_time}.txt")
+        @statistics = QuizName::Statistics.new(@writer)
     end
-    @user_name = username
-    @current_time = Time.now.strftime("%d-%m-%Y %H:%M:%S")
-    @writer = QuizName::FileWriter.new('a', QuizName::Quiz.instance.answers_dir, "#{@user_name}_#{@current_time}.txt")
-    @statistics = QuizName::Statistics.new(@writer)
-  end
 
     def run
       puts "Welcome, #{@user_name}!"

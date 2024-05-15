@@ -4,6 +4,10 @@ module QuizName
       @mode = mode
       @answers_dir = args[0]
       @filename = args[1]
+      if @filename
+        @filename.gsub!(/\\.txt$/, '')
+      end
+      puts "Answers directory: #{@answers_dir}"
     end
 
     def write(message)
@@ -13,7 +17,9 @@ module QuizName
     end
 
     def prepare_filename(dir, filename)
-      File.expand_path("#{filename}.txt", dir)
+      sanitized_filename = filename.gsub(/[^0-9A-Za-z.\-]/, '_')
+      filename_with_extension = sanitized_filename.end_with?(".txt") ? sanitized_filename : sanitized_filename + ".txt"
+      File.expand_path(filename_with_extension, dir)
     end
   end
 end

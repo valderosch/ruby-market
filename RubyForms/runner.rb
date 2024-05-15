@@ -16,7 +16,7 @@ module QuizName
       puts "App run"
       @quiz.config
 
-      username = InputReader.read(welcome_message: 'Enter your username:', validator: ->(input) { !input.empty? }, error_message: 'Username cannot be empty')
+      username = InputReader.read(welcome_message: 'Enter your username:', validator: ->(input) { !input.empty? }, error_message: 'Username cannot be empty').gsub(/[^\w]/, '_')
       start_time = Time.now
       puts "USERNAME: #{username}"
       puts "TIME: #{start_time}"
@@ -29,6 +29,9 @@ module QuizName
       result = engine.result
       end_time = Time.now
       @statistics.add_result(username, start_time, end_time, result)
+
+      answers_dir = Quiz.instance.answers_dir
+      FileUtils.mkdir_p(answers_dir) unless File.directory?(answers_dir)
 
       @file_writer.write_result(username, result)
 

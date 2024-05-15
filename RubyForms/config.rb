@@ -9,7 +9,7 @@ module QuizName
     end
 
     self.yaml_dir = "config/yml/outdata"
-    self.answers_dir = "config/answers"
+    self.answers_dir = File.expand_path("config/answers", __dir__)
     self.in_ext = "config/yml/indata"
   end
 end
