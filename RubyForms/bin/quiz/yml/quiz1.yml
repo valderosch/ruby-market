@@ -5,23 +5,23 @@
     - Malinformation
   correct_answer: Disinformation
 
-- question: Not the True about some information is
+- question: What is the best way to delete file
   answers:
-    - Disinformation
-    - Misinformation
-    - Malinformation
-  correct_answer: Disinformation
+    - Console
+    - Trashcan
+    - Virus
+  correct_answer: Console
 
-- question: Not the True about some information is
+- question: Which language is the oldest
   answers:
-    - Disinformation
-    - Misinformation
-    - Malinformation
-  correct_answer: Disinformation
+    - C#
+    - JavaScript
+    - Perl
+  correct_answer: Perl
 
-- question: Not the True about some information is
+- question: Which one is markup language
   answers:
-    - Disinformation
-    - Misinformation
-    - Malinformation
-  correct_answer: Disinformation
+    - CSS
+    - HTML
+    - Ruby
+  correct_answer: HTML
